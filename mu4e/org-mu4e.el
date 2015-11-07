@@ -74,7 +74,7 @@ Example usage:
     (if (and (eq major-mode 'mu4e-headers-mode)
 	  org-mu4e-link-query-in-headers-mode)
       ;; storing links to queries
-      (let* ((query (mu4e-last-query))
+      (let* ((query (mu4e-last-query-string))
 	      desc link)
 	(org-store-link-props :type "mu4e" :query query)
 	(setq

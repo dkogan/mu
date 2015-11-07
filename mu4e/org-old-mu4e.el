@@ -66,7 +66,7 @@ Example usage:
   (cond
     ;; storing links to queries
     ((eq major-mode 'mu4e-headers-mode)
-      (let* ((query (mu4e-last-query))
+      (let* ((query (mu4e-last-query-string))
 	      desc link)
 	(org-store-link-props :type "mu4e" :query query)
 	(setq

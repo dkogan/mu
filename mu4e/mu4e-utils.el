@@ -475,11 +475,26 @@ Or go to the top level if there is none."
 	  (t               "mu4e"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun mu4e-last-query ()
-  "Get the most recent query or nil if there is none."
+(defun mu4e~get-query-string (query)
+  "Returns the string part of a query. Any custom variables are
+ignored."
+  (if (consp query) (car query) query))
+
+(defun mu4e~get-query-custom-variables (query)
+  "Returns the custom variables in a query. The string is
+ignored."
+  (if (consp query) (cdr query) nil))
+
+(defun mu4e~get-customized-query (string custom-variables)
+  "Returns a query extended with the given custom variables"
+  (if custom-variables (cons string custom-variables) string))
+
+
+(defun mu4e-last-query-string ()
+  "Get the most recent query string or nil if there is none."
   (when (buffer-live-p mu4e~headers-buffer)
     (with-current-buffer  mu4e~headers-buffer
-      mu4e~headers-last-query)))
+      (mu4e~get-query-string mu4e~headers-last-query))))
 
 (defun mu4e-select-other-view ()
   "When the headers view is selected, select the message view (if

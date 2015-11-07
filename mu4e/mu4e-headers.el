@@ -958,7 +958,8 @@ the query history stack."
   (mu4e-hide-other-mu4e-buffers)
   (let* ((buf (get-buffer-create mu4e~headers-buffer-name))
 	 (inhibit-read-only t)
-	  (maxnum (unless mu4e-headers-full-search mu4e-headers-results-limit)))
+	  (maxnum (unless mu4e-headers-full-search mu4e-headers-results-limit))
+          (expr-string (mu4e~get-query-string expr)))
     (with-current-buffer buf
       (mu4e-headers-mode)
       (unless ignore-history
@@ -969,17 +970,18 @@ the query history stack."
 	mu4e~headers-buffer buf
 	mode-name "mu4e-headers"
 	mu4e~headers-last-query expr
-	global-mode-string (propertize mu4e~headers-last-query
+	global-mode-string (propertize expr-string
 			     'face 'mu4e-modeline-face)))
     (switch-to-buffer buf)
-    (mu4e~proc-find
-      expr
-      mu4e-headers-show-threads
-      mu4e-headers-sort-field
-      mu4e-headers-sort-direction
-      maxnum
-      mu4e-headers-skip-duplicates
-      mu4e-headers-include-related)))
+    (eval `(let ,(mu4e~get-query-custom-variables expr)
+             (mu4e~proc-find
+              expr-string
+              mu4e-headers-show-threads
+              mu4e-headers-sort-field
+              mu4e-headers-sort-direction
+              maxnum
+              mu4e-headers-skip-duplicates
+              mu4e-headers-include-related)))))
 
 (defun mu4e~headers-redraw-get-view-window ()
   "Close all windows, redraw the headers buffer based on the value
@@ -1189,13 +1191,18 @@ stack size."
 	    (past   mu4e~headers-query-past)
 	    (future mu4e~headers-query-future))))
      ;; only add if not the same item
-    (unless (and stack (string= (car stack) query))
+    (unless (and stack (string=
+                        (mu4e~get-query-string (car stack))
+                        (mu4e~get-query-string query)))
       (push query stack)
       ;; limit the stack to `mu4e~headers-query-stack-size' elements
       (when (> (length stack) mu4e~headers-query-stack-size)
 	(setq stack (subseq stack 0 mu4e~headers-query-stack-size)))
       ;; remove all duplicates of the new element
-      (remove-if (lambda (elm) (string= elm (car stack))) (cdr stack))
+      (remove-if (lambda (elm) (string=
+                                (mu4e~get-query-string elm)
+                                (mu4e~get-query-string (car stack))))
+                 (cdr stack))
       ;; update the stacks
       (case where
 	(past   (setq mu4e~headers-query-past   stack))
@@ -1233,13 +1240,15 @@ history stack."
   ;; `mu4e~headers-query-next' or `mu4e~headers-query-prev'."
   (interactive)
   (let* ((prompt (mu4e-format (or prompt "Search for: ")))
-	  (expr
+	  (expr-custom-variables (mu4e~get-query-custom-variables expr))
+          (expr (mu4e~get-query-string expr))
+          (expr
 	    (if edit
 	      (read-string prompt expr)
 	      (or expr
 		(read-string prompt nil 'mu4e~headers-search-hist)))))
     (mu4e-mark-handle-when-leaving)
-    (mu4e~headers-search-execute expr
+    (mu4e~headers-search-execute (mu4e~get-customized-query expr expr-custom-variables)
       ignore-history)))
 
 (defun mu4e-headers-search-edit ()
@@ -1275,7 +1284,12 @@ query (effectively, 'widen' it), with `mu4e-headers-query-prev'."
   (unless mu4e~headers-last-query
     (mu4e-warn "There's nothing to filter"))
   (mu4e-headers-search
-    (format "(%s) AND %s" mu4e~headers-last-query filter)))
+   (mu4e~get-customized-query
+    (format "(%s) AND %s"
+            (mu4e~get-query-string mu4e~headers-last-query)
+            filter))
+   (mu4e~get-query-custom-variables mu4e~headers-last-query)))
+
 
 
 (defun mu4e-headers-change-sorting (&optional field dir)

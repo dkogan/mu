@@ -751,7 +751,19 @@ when mu4e starts.")
 \(in the 'pong-handler').")
 
 (defvar mu4e~headers-last-query nil
-  "The present (most recent) query.")
+  "The present (most recent) query. This query can be a plain
+string that is passed to mu. Or the query can have a structure
+
+  (query-string . custom-variables)
+
+where query-string is the string as before and custom-variables
+is a list of variable settings such as
+
+  ((mu4e-headers-show-threads t)
+   (mu4e-headers-include-related t))
+
+When such searches are re-run, the variable customizations
+override the default values.")
 
 
 
