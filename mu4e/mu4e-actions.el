@@ -273,7 +273,10 @@ store your org-contacts."
   "Show all the messages in the given thread."
   (let ((msgid (mu4e-message-field msg :message-id)))
     (when msgid
-      (let ((query-string (format "msgid:%s" msgid))
+      (let ((query-string
+             (format "(%s) AND msgid:%s"
+                     (mu4e~get-query-string mu4e~headers-last-query)
+                     msgid))
             (custom-variables '((mu4e-headers-show-threads t)
                                 (mu4e-headers-include-related t))))
         (mu4e-headers-search (mu4e~get-customized-query query-string custom-variables)
