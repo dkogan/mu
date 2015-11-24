@@ -1289,8 +1289,8 @@ query (effectively, 'widen' it), with `mu4e-headers-query-prev'."
    (mu4e~get-customized-query
     (format "(%s) AND %s"
             (mu4e~get-query-string mu4e~headers-last-query)
-            filter))
-   (mu4e~get-query-custom-variables mu4e~headers-last-query)))
+            filter)
+    (mu4e~get-query-custom-variables mu4e~headers-last-query))))
 
 
 
