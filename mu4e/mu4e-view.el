@@ -100,7 +100,7 @@ directory and saves all attachments in the chosen directory."
 (defvar mu4e-view-actions
   '( ("capture message"  . mu4e-action-capture-message)
      ("view as pdf"      . mu4e-action-view-as-pdf)
-     ("show this thread" . mu4e-action-show-thread)))
+     ("show this thread" . mu4e-action-show-thread))
 
 
   "List of actions to perform on messages in view mode.
