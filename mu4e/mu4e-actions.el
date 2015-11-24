@@ -274,9 +274,7 @@ store your org-contacts."
   (let ((msgid (mu4e-message-field msg :message-id)))
     (when msgid
       (let ((query-string
-             (format "(%s) AND msgid:%s"
-                     (mu4e~get-query-string mu4e~headers-last-query)
-                     msgid))
+             (format "msgid:%s" msgid))
             (custom-variables '((mu4e-headers-show-threads t)
                                 (mu4e-headers-include-related t))))
         (mu4e-headers-search (mu4e~get-customized-query query-string custom-variables)
